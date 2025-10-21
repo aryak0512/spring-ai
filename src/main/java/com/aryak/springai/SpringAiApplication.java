@@ -1,5 +1,6 @@
 package com.aryak.springai;
 
+import com.aryak.springai.rag.HrPolicyLoader;
 import com.aryak.springai.rag.RandomDataLoader;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +18,15 @@ public class SpringAiApplication {
     public CommandLineRunner commandLineRunner(RandomDataLoader dataLoader) {
         return args -> {
             // do something at startup
-            dataLoader.loadDataInVectorStore();
+            //dataLoader.loadDataInVectorStore();
+        };
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner1(HrPolicyLoader hrPolicyLoader) {
+        return args -> {
+            // do something at startup
+            hrPolicyLoader.loadHrPolicyPdfDataInVectorStore();
         };
     }
 
