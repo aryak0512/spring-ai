@@ -96,4 +96,23 @@ public class ChatClientConfig {
     public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
         return openAiEmbeddingModel;
     }
+
+    @Bean
+    public ChatClient ragClient(OpenAiChatModel openAiChatModel,
+                                JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+
+        // customise maxMessages
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .maxMessages(200)
+                .chatMemoryRepository(jdbcChatMemoryRepository)
+                .build();
+
+        // configure the memory chat advisor
+        Advisor memoryChatAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
+                .build();
+
+        ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
+                .defaultAdvisors(memoryChatAdvisor);
+        return builder.build();
+    }
 }

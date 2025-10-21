@@ -4,6 +4,9 @@ import com.aryak.springai.model.CountryCitiesResponseDto;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
@@ -23,6 +27,8 @@ public class ChatController {
     private final ChatClient openAiClient;
     private final ChatClient basicClient;
     private final ChatClient chatMemoryClient;
+    private final ChatClient ragClient;
+    private final VectorStore vectorStore;
 
     @Value("classpath:/promptTemplates/user_prompt_template.st")
     private Resource userPromptTemplate;
@@ -33,13 +39,18 @@ public class ChatController {
     @Value("classpath:/promptTemplates/hr_system_prompt_template.st")
     private Resource hrSystemPromptTemplate;
 
+    @Value("classpath:/promptTemplates/random_data_prompt_template.st")
+    private Resource randomDataPromptTemplate;
+
     public ChatController(ChatClient ollamaClient,
                           ChatClient openAiClient,
-                          ChatClient basicClient, ChatClient chatMemoryClient) {
+                          ChatClient basicClient, ChatClient chatMemoryClient, ChatClient ragClient, VectorStore vectorStore) {
         this.ollamaClient = ollamaClient;
         this.openAiClient = openAiClient;
         this.basicClient = basicClient;
         this.chatMemoryClient = chatMemoryClient;
+        this.ragClient = ragClient;
+        this.vectorStore = vectorStore;
     }
 
     @GetMapping(value = "/ollama")
@@ -128,5 +139,33 @@ public class ChatController {
                 })
                 .call()
                 .content();
+    }
+
+    @GetMapping("/rag")
+    public String ragResponse(@RequestParam("customerName") String customerName,
+                              @RequestParam("customerMessage") String customerMessage) {
+
+        // fetching relevant sentences on the topic from vector store
+        SearchRequest searchRequest = SearchRequest.builder()
+                .topK(3) // select top 3 results in relevancy
+                .query(customerMessage)
+                .similarityThreshold(0.7) // match objects that are more than 70% relevant
+                .build();
+
+        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        System.out.println("No. of docs picked from vector store :" + similarDocuments.size());
+
+        String documents = similarDocuments.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining(","));
+        System.out.println("Sentences merged into a single string as :" + documents);
+        
+        return ragClient
+                .prompt()
+                .system(randomDataPromptTemplate)
+                .user(promptTemplateSpec ->
+                        promptTemplateSpec.text(userPromptTemplate)
+                                .param("documents", documents))
+                .call().content();
     }
 }
