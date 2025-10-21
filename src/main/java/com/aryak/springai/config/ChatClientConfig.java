@@ -10,10 +10,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 
@@ -79,5 +82,18 @@ public class ChatClientConfig {
         ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(memoryChatAdvisor);
         return builder.build();
+    }
+
+    /**
+     * This is required for vector store since qdrant
+     * gets an error when both LLM jars are on classpath
+     *
+     * @param openAiEmbeddingModel
+     * @return
+     */
+    @Bean
+    @Primary
+    public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
+        return openAiEmbeddingModel;
     }
 }
