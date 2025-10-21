@@ -44,4 +44,7 @@ GET http://localhost:8080/rag?message=What is the notice period?
 GET http://localhost:8080/rag/v2?message=नोटिस अवधि क्या है?
 
 ###
-GET http://localhost:8080/local-time?message=What is the current time in Mumbai&username=aryak
+GET http://localhost:8080/local-time?message=What is the current time in London?&username=aryak
+
+###
+GET http://localhost:8080/local-time?message=What is the current time?&username=aryak

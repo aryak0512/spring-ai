@@ -10,6 +10,7 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 @RestController
 public class TimeController {
+    
     private final ChatClient timeChatClient;
 
     public TimeController(ChatClient timeChatClient) {
