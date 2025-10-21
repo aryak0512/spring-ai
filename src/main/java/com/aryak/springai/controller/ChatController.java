@@ -19,6 +19,9 @@ public class ChatController {
     @Value("classpath:/promptTemplates/system_prompt_template.st")
     private Resource systemPromptTemplate;
 
+    @Value("classpath:/promptTemplates/hr_system_prompt_template.st")
+    private Resource hrSystemPromptTemplate;
+
     public ChatController(ChatClient ollamaClient, ChatClient openAiClient) {
         this.ollamaClient = ollamaClient;
         this.openAiClient = openAiClient;
@@ -47,6 +50,15 @@ public class ChatController {
                         promptTemplateSpec.text(userPromptTemplate)
                                 .param("customerName", customerName)
                                 .param("customerMessage", customerMessage))
+                .call().content();
+    }
+
+    @GetMapping("/promptStuffing")
+    public String promptStuffing(@RequestParam String message) {
+        return openAiClient
+                .prompt()
+                .system(hrSystemPromptTemplate)
+                .user(message)
                 .call().content();
     }
 }

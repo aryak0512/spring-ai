@@ -9,3 +9,6 @@ GET http://localhost:8080/openai?message=What is function functional interface?
 ###
 GET http://localhost:8080/email?customerName=John&
     customerMessage=I have not been able to log in to my account since last 2 days. I am fed up
+
+###
+GET http://localhost:8080/promptStuffing?message=How many sick leaves can I take in a year?
