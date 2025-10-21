@@ -36,3 +36,6 @@ GET http://localhost:8080/memory?message=Do you remember my name?&username=Ben
 
 ###
 GET http://localhost:8080/rag?message=How many sick leaves can I take in a year?
+
+###
+GET http://localhost:8080/rag?message=What is the notice period?

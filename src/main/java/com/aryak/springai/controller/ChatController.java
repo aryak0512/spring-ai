@@ -170,4 +170,12 @@ public class ChatController {
                 .user(message)
                 .call().content();
     }
+
+    @GetMapping("/rag/v2")
+    public String ragResponseUsingRagAdvisor(@RequestParam("message") String message) {
+        return ragClient
+                .prompt()
+                .user(message)
+                .call().content();
+    }
 }

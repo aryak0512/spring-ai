@@ -14,6 +14,9 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -99,7 +102,8 @@ public class ChatClientConfig {
 
     @Bean
     public ChatClient ragClient(OpenAiChatModel openAiChatModel,
-                                JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+                                JdbcChatMemoryRepository jdbcChatMemoryRepository,
+                                RetrievalAugmentationAdvisor retrievalAugmentationAdvisor) {
 
         // customise maxMessages
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
@@ -112,7 +116,21 @@ public class ChatClientConfig {
                 .build();
 
         ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
-                .defaultAdvisors(memoryChatAdvisor);
+                .defaultAdvisors(memoryChatAdvisor, retrievalAugmentationAdvisor);
         return builder.build();
+    }
+
+    @Bean
+    RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(final VectorStore vectorStore) {
+
+        var documentRetriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .topK(3)
+                .similarityThreshold(0.7)
+                .build();
+        
+        return RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(documentRetriever)
+                .build();
     }
 }
