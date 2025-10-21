@@ -66,13 +66,13 @@ public class ChatClientConfig {
     public ChatClient chatMemoryClient(OpenAiChatModel openAiChatModel,
                                        JdbcChatMemoryRepository jdbcChatMemoryRepository) {
 
-        // configure the memory chat advisor
+        // customise maxMessages
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
                 .maxMessages(200)
                 .chatMemoryRepository(jdbcChatMemoryRepository)
                 .build();
 
-        // customise maxMessages
+        // configure the memory chat advisor
         Advisor memoryChatAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
                 .build();
 
