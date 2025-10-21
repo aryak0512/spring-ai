@@ -2,12 +2,17 @@ package com.aryak.springai.controller;
 
 import com.aryak.springai.model.CountryCitiesResponseDto;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.converter.ListOutputConverter;
+import org.springframework.ai.converter.MapOutputConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ChatController {
@@ -88,5 +93,21 @@ public class ChatController {
                 .user(message)
                 .call()
                 .entity(CountryCitiesResponseDto.class);
+    }
+
+    @GetMapping(value = "/list")
+    public List<String> exploreListOutputConverter(@RequestParam String message) {
+        return basicClient.prompt()
+                .user(message)
+                .call()
+                .entity(new ListOutputConverter());
+    }
+
+    @GetMapping(value = "/map")
+    public Map<String, Object> exploreMapOutputConverter(@RequestParam String message) {
+        return basicClient.prompt()
+                .user(message)
+                .call()
+                .entity(new MapOutputConverter());
     }
 }
