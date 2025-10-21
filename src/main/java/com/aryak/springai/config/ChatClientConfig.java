@@ -15,6 +15,7 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
@@ -121,15 +122,24 @@ public class ChatClientConfig {
     }
 
     @Bean
-    RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(final VectorStore vectorStore) {
+    RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(final VectorStore vectorStore,
+                                                              final OpenAiChatModel openAiChatModel) {
 
         var documentRetriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(vectorStore)
                 .topK(3)
                 .similarityThreshold(0.7)
                 .build();
-        
+
+        // to handle prompts other than english
+        TranslationQueryTransformer translationQueryTransformer = TranslationQueryTransformer
+                .builder()
+                .chatClientBuilder(ChatClient.builder(openAiChatModel))
+                .targetLanguage("english")
+                .build();
+
         return RetrievalAugmentationAdvisor.builder()
+                .queryTransformers(translationQueryTransformer)
                 .documentRetriever(documentRetriever)
                 .build();
     }

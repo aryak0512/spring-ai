@@ -39,3 +39,6 @@ GET http://localhost:8080/rag?message=How many sick leaves can I take in a year?
 
 ###
 GET http://localhost:8080/rag?message=What is the notice period?
+
+###
+GET http://localhost:8080/rag/v2?message=नोटिस अवधि क्या है?
