@@ -7,6 +7,8 @@ import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -61,11 +63,18 @@ public class ChatClientConfig {
     }
 
     @Bean
-    public ChatClient chatMemoryClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory) {
+    public ChatClient chatMemoryClient(OpenAiChatModel openAiChatModel,
+                                       JdbcChatMemoryRepository jdbcChatMemoryRepository) {
 
         // configure the memory chat advisor
-        Advisor memoryChatAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
-        Advisor loggerAdvisor = new SimpleLoggerAdvisor();
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .maxMessages(200)
+                .chatMemoryRepository(jdbcChatMemoryRepository)
+                .build();
+
+        // customise maxMessages
+        Advisor memoryChatAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
+                .build();
 
         ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(memoryChatAdvisor);
