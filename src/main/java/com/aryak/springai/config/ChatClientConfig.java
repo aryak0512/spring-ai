@@ -50,4 +50,11 @@ public class ChatClientConfig {
                         \s""");
         return builder.build();
     }
+
+    @Bean
+    public ChatClient basicClient(OpenAiChatModel openAiChatModel) {
+        ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
+                .defaultAdvisors(new SimpleLoggerAdvisor());
+        return builder.build();
+    }
 }

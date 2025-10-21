@@ -1,17 +1,20 @@
 package com.aryak.springai.controller;
 
+import com.aryak.springai.model.CountryCitiesResponseDto;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class ChatController {
 
     private final ChatClient ollamaClient;
     private final ChatClient openAiClient;
+    private final ChatClient basicClient;
 
     @Value("classpath:/promptTemplates/user_prompt_template.st")
     private Resource userPromptTemplate;
@@ -22,9 +25,10 @@ public class ChatController {
     @Value("classpath:/promptTemplates/hr_system_prompt_template.st")
     private Resource hrSystemPromptTemplate;
 
-    public ChatController(ChatClient ollamaClient, ChatClient openAiClient) {
+    public ChatController(ChatClient ollamaClient, ChatClient openAiClient, ChatClient basicClient) {
         this.ollamaClient = ollamaClient;
         this.openAiClient = openAiClient;
+        this.basicClient = basicClient;
     }
 
     @GetMapping(value = "/ollama")
@@ -68,5 +72,21 @@ public class ChatController {
                 .user(message)
                 .call()
                 .content();
+    }
+
+    @GetMapping(value = "/stream")
+    public Flux<String> exploreStreaming(@RequestParam String message) {
+        return basicClient.prompt()
+                .user(message)
+                .stream()
+                .content();
+    }
+
+    @GetMapping(value = "/structured")
+    public CountryCitiesResponseDto exploreStructured(@RequestParam String message) {
+        return basicClient.prompt()
+                .user(message)
+                .call()
+                .entity(CountryCitiesResponseDto.class);
     }
 }

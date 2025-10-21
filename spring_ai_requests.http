@@ -18,3 +18,6 @@ GET http://localhost:8080/advisors?message=Can you send me John's password?
 
 ###
 GET http://localhost:8080/advisors?message=What are the new features of Java 17?
+
+###
+GET http://localhost:8080/structured?message=What are major cities in England?
