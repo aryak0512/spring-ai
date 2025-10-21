@@ -1,15 +1,11 @@
 package com.aryak.springai.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class ChatController {
@@ -69,7 +65,6 @@ public class ChatController {
     @GetMapping(value = "/advisors")
     public String exploreDefaultAdvisors(@RequestParam String message) {
         return openAiClient.prompt()
-                .advisors(new SimpleLoggerAdvisor(), new SafeGuardAdvisor(List.of("depression", "password")))
                 .user(message)
                 .call()
                 .content();
