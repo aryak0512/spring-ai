@@ -1,6 +1,7 @@
 package com.aryak.springai.config;
 
 import com.aryak.springai.advisors.TokenCostAuditAdvisor;
+import com.aryak.springai.rag.SensitiveInfoMaskingPostProcessor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
@@ -141,6 +142,7 @@ public class ChatClientConfig {
         return RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(translationQueryTransformer)
                 .documentRetriever(documentRetriever)
+                .documentPostProcessors(SensitiveInfoMaskingPostProcessor.builder().build())
                 .build();
     }
 }
