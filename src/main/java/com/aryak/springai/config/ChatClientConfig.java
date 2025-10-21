@@ -2,9 +2,11 @@ package com.aryak.springai.config;
 
 import com.aryak.springai.advisors.TokenCostAuditAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -55,6 +57,18 @@ public class ChatClientConfig {
     public ChatClient basicClient(OpenAiChatModel openAiChatModel) {
         ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
                 .defaultAdvisors(new SimpleLoggerAdvisor());
+        return builder.build();
+    }
+
+    @Bean
+    public ChatClient chatMemoryClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory) {
+
+        // configure the memory chat advisor
+        Advisor memoryChatAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
+        Advisor loggerAdvisor = new SimpleLoggerAdvisor();
+
+        ChatClient.Builder builder = ChatClient.builder(openAiChatModel)
+                .defaultAdvisors(memoryChatAdvisor);
         return builder.build();
     }
 }

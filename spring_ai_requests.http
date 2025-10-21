@@ -21,3 +21,15 @@ GET http://localhost:8080/advisors?message=What are the new features of Java 17?
 
 ###
 GET http://localhost:8080/structured?message=What are major cities in England?
+
+###
+GET http://localhost:8080/memory?message=My name is Aryak&username=aryak
+
+###
+GET http://localhost:8080/memory?message=My name is Ben&username=Ben
+
+###
+GET http://localhost:8080/memory?message=What is my name?&username=aryak
+
+###
+GET http://localhost:8080/memory?message=Do you remember my name?&username=Ben

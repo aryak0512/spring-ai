@@ -14,12 +14,15 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+
 @RestController
 public class ChatController {
 
     private final ChatClient ollamaClient;
     private final ChatClient openAiClient;
     private final ChatClient basicClient;
+    private final ChatClient chatMemoryClient;
 
     @Value("classpath:/promptTemplates/user_prompt_template.st")
     private Resource userPromptTemplate;
@@ -30,10 +33,13 @@ public class ChatController {
     @Value("classpath:/promptTemplates/hr_system_prompt_template.st")
     private Resource hrSystemPromptTemplate;
 
-    public ChatController(ChatClient ollamaClient, ChatClient openAiClient, ChatClient basicClient) {
+    public ChatController(ChatClient ollamaClient,
+                          ChatClient openAiClient,
+                          ChatClient basicClient, ChatClient chatMemoryClient) {
         this.ollamaClient = ollamaClient;
         this.openAiClient = openAiClient;
         this.basicClient = basicClient;
+        this.chatMemoryClient = chatMemoryClient;
     }
 
     @GetMapping(value = "/ollama")
@@ -109,5 +115,18 @@ public class ChatController {
                 .user(message)
                 .call()
                 .entity(new MapOutputConverter());
+    }
+
+    @GetMapping(value = "/memory")
+    public String exploreMapOutputConverter(@RequestParam String message,
+                                            @RequestParam String username) {
+        return chatMemoryClient.prompt()
+                .user(message)
+                .advisors(s -> {
+                    s.param(CONVERSATION_ID, username);
+                    s.param("region", "India");
+                })
+                .call()
+                .content();
     }
 }
