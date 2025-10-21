@@ -9,13 +9,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     private final ChatClient ollamaClient;
+    private final ChatClient openAiClient;
 
-    public ChatController(ChatClient ollamaClient) {
+    public ChatController(ChatClient ollamaClient, ChatClient openAiClient) {
         this.ollamaClient = ollamaClient;
+        this.openAiClient = openAiClient;
     }
 
     @GetMapping(value = "/ollama")
     public String testPrompt(@RequestParam String message) {
         return ollamaClient.prompt(message).call().content();
+    }
+
+    @GetMapping(value = "/openai")
+    public String testPrompt2(@RequestParam String message) {
+        return openAiClient.prompt(message).call().content();
     }
 }
