@@ -1,4 +1,7 @@
 ### GET request to example server
-GET http://localhost:8080/?message=Hey which model are you?
+GET http://localhost:8080/openai?message=Hey which model are you?
+
+###
+GET http://localhost:8080/openai?message=What is function functional interface?
 
 ###
