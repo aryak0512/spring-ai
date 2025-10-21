@@ -42,6 +42,9 @@ public class ChatController {
     @Value("classpath:/promptTemplates/random_data_prompt_template.st")
     private Resource randomDataPromptTemplate;
 
+    @Value("classpath:/promptTemplates/hr_rag_prompt_template.st")
+    private Resource hrRagPromptTemplate;
+
     public ChatController(ChatClient ollamaClient,
                           ChatClient openAiClient,
                           ChatClient basicClient, ChatClient chatMemoryClient, ChatClient ragClient, VectorStore vectorStore) {
@@ -142,13 +145,12 @@ public class ChatController {
     }
 
     @GetMapping("/rag")
-    public String ragResponse(@RequestParam("customerName") String customerName,
-                              @RequestParam("customerMessage") String customerMessage) {
+    public String ragResponse(@RequestParam("message") String message) {
 
         // fetching relevant sentences on the topic from vector store
         SearchRequest searchRequest = SearchRequest.builder()
                 .topK(3) // select top 3 results in relevancy
-                .query(customerMessage)
+                .query(message)
                 .similarityThreshold(0.7) // match objects that are more than 70% relevant
                 .build();
 
@@ -159,13 +161,13 @@ public class ChatController {
                 .map(Document::getText)
                 .collect(Collectors.joining(","));
         System.out.println("Sentences merged into a single string as :" + documents);
-        
+
         return ragClient
                 .prompt()
-                .system(randomDataPromptTemplate)
-                .user(promptTemplateSpec ->
-                        promptTemplateSpec.text(userPromptTemplate)
+                .system(promptTemplateSpec ->
+                        promptTemplateSpec.text(hrRagPromptTemplate)
                                 .param("documents", documents))
+                .user(message)
                 .call().content();
     }
 }

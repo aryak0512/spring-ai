@@ -33,3 +33,6 @@ GET http://localhost:8080/memory?message=What is my name?&username=aryak
 
 ###
 GET http://localhost:8080/memory?message=Do you remember my name?&username=Ben
+
+###
+GET http://localhost:8080/rag?message=How many sick leaves can I take in a year?
