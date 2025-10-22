@@ -48,3 +48,12 @@ GET http://localhost:8080/local-time?message=What is the current time in London?
 
 ###
 GET http://localhost:8080/local-time?message=What is the current time?&username=aryak
+
+###
+GET http://localhost:8080/helpdesk?message=Seems the account is locked?&username=aryak
+
+###
+GET http://localhost:8080/helpdesk?message=Yes please?&username=aryak
+
+###
+GET http://localhost:8080/helpdesk?message=What is the update on my ticket?&username=aryak
